@@ -1,0 +1,41 @@
+from typing import List
+
+class Solution:
+    def fullJustify(self, words: List[str], maxWidth: int) -> List[str]:
+        res = []
+        i = 0
+        n = len(words)
+
+        while i < n:
+            line_len = 0
+            j = i
+            while j < n and line_len + len(words[j]) + (j - i) <= maxWidth:
+                line_len += len(words[j])
+                j += 1
+
+            line = ""
+            number_of_words = j - i
+            total_spaces = maxWidth - line_len
+
+            if j == n or number_of_words == 1:
+                for k in range(i, j):
+                    line += words[k]
+                    if k != j - 1:
+                        line += " "
+                line += " " * (maxWidth - len(line))
+            else:
+                spaces_between_words = total_spaces // (number_of_words - 1)
+                extra_spaces = total_spaces % (number_of_words - 1)
+
+                for k in range(i, j):
+                    line += words[k]
+                    if k != j - 1:
+                        space_to_add = spaces_between_words + (1 if extra_spaces > 0 else 0)
+                        line += " " * space_to_add
+                        if extra_spaces > 0:
+                            extra_spaces -= 1
+
+            res.append(line)
+            i = j
+
+        return res
