@@ -1,0 +1,37 @@
+from collections import defaultdict
+from fractions import Fraction
+from typing import List
+
+class Solution:
+    def maxPoints(self, points: List[List[int]]) -> int:
+        n = len(points)
+        if n <= 2:
+            return n
+        
+        max_points = 0
+        
+        for i in range(n):
+            slopes = defaultdict(int)
+            duplicates = 1
+            
+            for j in range(i + 1, n):
+                x1, y1 = points[i]
+                x2, y2 = points[j]
+                
+                if x1 == x2 and y1 == y2:
+                    duplicates += 1
+                else:
+                    if x1 == x2:
+                        slope = 'inf'
+                    else:
+                        slope = Fraction(y2 - y1, x2 - x1)
+                    
+                    slopes[slope] += 1
+            
+            current_max = duplicates
+            if slopes:
+                current_max += max(slopes.values())
+            
+            max_points = max(max_points, current_max)
+        
+        return max_points
