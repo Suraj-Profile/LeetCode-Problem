@@ -1,0 +1,17 @@
+class Solution:
+    def isHappy(self, n: int) -> bool:
+        def get_sum(x):
+            s = 0
+            while x > 0:
+                s += (x % 10) ** 2
+                x //= 10
+            return s
+        
+        slow = n
+        fast = get_sum(n)
+        
+        while fast != 1 and slow != fast:
+            slow = get_sum(slow)
+            fast = get_sum(get_sum(fast))
+        
+        return fast == 1
