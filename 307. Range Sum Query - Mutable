@@ -1,0 +1,43 @@
+class NumArray:
+
+    def __init__(self, nums: List[int]):
+        self.n = len(nums)
+        self.seg = [0] * (4 * self.n)
+        self.build(0, 0, self.n - 1, nums)
+
+    def build(self, idx, left, right, nums):
+        if left == right:
+            self.seg[idx] = nums[left]
+            return
+        mid = (left + right) // 2
+        self.build(2 * idx + 1, left, mid, nums)
+        self.build(2 * idx + 2, mid + 1, right, nums)
+        self.seg[idx] = self.seg[2 * idx + 1] + self.seg[2 * idx + 2]
+
+    def update(self, index: int, val: int) -> None:
+        self._update(0, 0, self.n - 1, index, val)
+
+    def _update(self, idx, left, right, pos, val):
+        if left == right:
+            self.seg[idx] = val
+            return
+        mid = (left + right) // 2
+        if pos <= mid:
+            self._update(2 * idx + 1, left, mid, pos, val)
+        else:
+            self._update(2 * idx + 2, mid + 1, right, pos, val)
+        self.seg[idx] = self.seg[2 * idx + 1] + self.seg[2 * idx + 2]
+
+    def sumRange(self, left: int, right: int) -> int:
+        return self._query(0, 0, self.n - 1, left, right)
+
+    def _query(self, idx, left, right, ql, qr):
+        if ql <= left and right <= qr:
+            return self.seg[idx]
+        if right < ql or left > qr:
+            return 0
+        mid = (left + right) // 2
+        return (
+            self._query(2 * idx + 1, left, mid, ql, qr) +
+            self._query(2 * idx + 2, mid + 1, right, ql, qr)
+        )
