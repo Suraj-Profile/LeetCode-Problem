@@ -1,0 +1,23 @@
+from bisect import bisect_left
+
+class Solution:
+    def maxEnvelopes(self, envelopes):
+        
+        # Step 1: Sort
+        envelopes.sort(key=lambda x: (x[0], -x[1]))
+        
+        # Step 2: Extract heights
+        heights = [h for w, h in envelopes]
+        
+        # Step 3: LIS on heights
+        lis = []
+        
+        for h in heights:
+            pos = bisect_left(lis, h)
+            
+            if pos == len(lis):
+                lis.append(h)
+            else:
+                lis[pos] = h
+        
+        return len(lis)
