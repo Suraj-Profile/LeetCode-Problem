@@ -1,0 +1,28 @@
+from typing import List
+
+class Solution:
+    def palindromePairs(self, words: List[str]) -> List[List[int]]:
+        
+        def isPalindrome(s):
+            return s == s[::-1]
+        
+        wordMap = {word: i for i, word in enumerate(words)}
+        res = []
+        
+        for i, word in enumerate(words):
+            for j in range(len(word) + 1):
+                
+                left = word[:j]
+                right = word[j:]
+                
+                if isPalindrome(left):
+                    rev = right[::-1]
+                    if rev in wordMap and wordMap[rev] != i:
+                        res.append([wordMap[rev], i])
+                
+                if j != len(word) and isPalindrome(right):
+                    rev = left[::-1]
+                    if rev in wordMap and wordMap[rev] != i:
+                        res.append([i, wordMap[rev]])
+        
+        return res
