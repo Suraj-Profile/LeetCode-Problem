@@ -1,0 +1,36 @@
+from typing import List
+
+class Solution:
+    def canPartitionGrid(self, grid: List[List[int]]) -> bool:
+        m, n = len(grid), len(grid[0])
+        
+        # Step 1: total sum
+        total = sum(sum(row) for row in grid)
+        
+        # If total is odd → not possible
+        if total % 2 != 0:
+            return False
+        
+        target = total // 2
+        
+        # Step 2: check horizontal cuts
+        curr_sum = 0
+        for i in range(m - 1):  # ensure bottom part is non-empty
+            curr_sum += sum(grid[i])
+            if curr_sum == target:
+                return True
+        
+        # Step 3: compute column sums
+        col_sum = [0] * n
+        for i in range(m):
+            for j in range(n):
+                col_sum[j] += grid[i][j]
+        
+        # Step 4: check vertical cuts
+        curr_sum = 0
+        for j in range(n - 1):  # ensure right part is non-empty
+            curr_sum += col_sum[j]
+            if curr_sum == target:
+                return True
+        
+        return False
