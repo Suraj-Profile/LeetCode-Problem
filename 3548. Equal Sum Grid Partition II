@@ -1,0 +1,92 @@
+from typing import List
+from collections import Counter
+
+class Solution:
+    def canPartitionGrid(self, grid: List[List[int]]) -> bool:
+        m, n = len(grid), len(grid[0])
+        
+        total = sum(sum(row) for row in grid)
+        
+        # full counter
+        bottom_counter = Counter()
+        for row in grid:
+            bottom_counter.update(row)
+        
+        def can_remove(counter, r1, r2, c1, c2, target):
+            if target not in counter:
+                return False
+            
+            rows = r2 - r1 + 1
+            cols = c2 - c1 + 1
+
+            if rows > 1 and cols > 1:
+                return True
+
+            if rows == 1:
+                return grid[r1][c1] == target or grid[r1][c2] == target
+
+            if cols == 1:
+                return grid[r1][c1] == target or grid[r2][c1] == target
+
+            return False
+        
+        # -------- Horizontal --------
+        top_sum = 0
+        top_counter = Counter()
+        
+        for i in range(m - 1):
+            for j in range(n):
+                val = grid[i][j]
+                top_sum += val
+                top_counter[val] += 1
+                bottom_counter[val] -= 1
+                if bottom_counter[val] == 0:
+                    del bottom_counter[val]
+
+            bottom_sum = total - top_sum
+
+            if top_sum == bottom_sum:
+                return True
+
+            diff = abs(top_sum - bottom_sum)
+
+            if top_sum > bottom_sum:
+                if can_remove(top_counter, 0, i, 0, n - 1, diff):
+                    return True
+            else:
+                if can_remove(bottom_counter, i + 1, m - 1, 0, n - 1, diff):
+                    return True
+
+        # -------- Vertical --------
+        left_sum = 0
+        left_counter = Counter()
+        
+        # rebuild full counter again
+        right_counter = Counter()
+        for row in grid:
+            right_counter.update(row)
+
+        for j in range(n - 1):
+            for i in range(m):
+                val = grid[i][j]
+                left_sum += val
+                left_counter[val] += 1
+                right_counter[val] -= 1
+                if right_counter[val] == 0:
+                    del right_counter[val]
+
+            right_sum = total - left_sum
+
+            if left_sum == right_sum:
+                return True
+
+            diff = abs(left_sum - right_sum)
+
+            if left_sum > right_sum:
+                if can_remove(left_counter, 0, m - 1, 0, j, diff):
+                    return True
+            else:
+                if can_remove(right_counter, 0, m - 1, j + 1, n - 1, diff):
+                    return True
+
+        return False
