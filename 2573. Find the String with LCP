@@ -1,0 +1,60 @@
+from typing import List
+
+class Solution:
+    def findTheString(self, lcp: List[List[int]]) -> str:
+        n = len(lcp)
+        
+        # Step 1: validate diagonal
+        for i in range(n):
+            if lcp[i][i] != n - i:
+                return ""
+        
+        # Step 2: Union-Find setup
+        parent = list(range(n))
+        
+        def find(x):
+            if parent[x] != x:
+                parent[x] = find(parent[x])
+            return parent[x]
+        
+        def union(x, y):
+            px, py = find(x), find(y)
+            if px != py:
+                parent[py] = px
+        
+        # Step 3: union indices where lcp > 0
+        for i in range(n):
+            for j in range(n):
+                if lcp[i][j] > 0:
+                    union(i, j)
+        
+        # Step 4: assign smallest characters
+        groups = {}
+        res = [''] * n
+        ch = ord('a')
+        
+        for i in range(n):
+            root = find(i)
+            if root not in groups:
+                if ch > ord('z'):
+                    return ""
+                groups[root] = chr(ch)
+                ch += 1
+            res[i] = groups[root]
+        
+        word = "".join(res)
+        
+        # Step 5: verify LCP matrix
+        calc = [[0] * n for _ in range(n)]
+        
+        for i in range(n - 1, -1, -1):
+            for j in range(n - 1, -1, -1):
+                if word[i] == word[j]:
+                    if i + 1 < n and j + 1 < n:
+                        calc[i][j] = 1 + calc[i + 1][j + 1]
+                    else:
+                        calc[i][j] = 1
+                else:
+                    calc[i][j] = 0
+        
+        return word if calc == lcp else ""
